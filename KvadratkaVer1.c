@@ -2,12 +2,12 @@
 #include <stdio.h>
 #include <math.h>
 
-const int ALLNUMBERS = -1;
-const double eps = 1e-8;                                                                  /*Глобальная переменная*/
+const int ALLNUMBERS = -1;                                                                  /*Глобальная переменная*/
+const double EPS = 1e-8;                                                                    /*Область погрешности*/
 
 int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 );            /*Обьявление функции, решающей квадратное уравнение*/
 int QuadraticInput ( double* a, double* b, double* c );                                     /*Обьявление функции ввода*/
-int Switch ( int SwitchReturn, double x1, double x2 );                                      /*Обьявление функции вывода*/
+int AnswerOutput ( int SwitchReturn, double x1, double x2 );                                      /*Обьявление функции вывода*/
 
 int main()
     {
@@ -19,7 +19,7 @@ int main()
 
     /*-----------------------Модуль запроса на вывод результата---------------------------*/
     int SwitchReturn = SolutionOfQuadratic( a, b, c, &x1, &x2);
-    Switch ( SwitchReturn, x1, x2 );
+    AnswerOutput ( SwitchReturn, x1, x2 );
     /*------------------------------------------------------------------------------------*/
     return 0;
     }
@@ -28,12 +28,18 @@ int main()
     /*-----------------------Модуль вычисления(функция, которая будет находить корни)---- */
 int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
     {
+    assert ( isfinite (a) );
+    assert ( isfinite (b) );
+    assert ( isfinite (c) );
+    assert ( x1 != NULL );
+    assert ( x2 != NULL );
+    assert ( x1 != x2 );
 
-    if ( fabs(a) < eps )
+    if ( fabs(a) < EPS )
         {
-        if ( fabs(b) < eps )
+        if ( fabs(b) < EPS )
             {
-            return ( fabs(c) < eps )? ALLNUMBERS : 0;
+            return ( fabs(c) < EPS )? ALLNUMBERS : 0;
             }
         else
             {
@@ -43,7 +49,7 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
     }
     else
         {
-        if ( fabs(b) < eps )
+        if ( fabs(b) < EPS )
             {
             *x1 =   sqrt(c/a);
             *x2 = - sqrt(c/a);
@@ -53,7 +59,7 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
             {
             double discriminant = b*b - 4*a*c;
 
-            if ( fabs(discriminant) < eps )
+            if ( fabs(discriminant) < EPS )
                 {
                 *x1 = (- b + sqrt(discriminant))/(2*a);
                 return 1;
@@ -101,7 +107,7 @@ int QuadraticInput ( double* a, double* b, double* c )
     /*------------------------------------------------------------------------------------*/
 
      /*-----------------------Модуль вывода результата-------------------------------------*/
-int Switch ( int SwitchReturn, double x1, double x2 )
+int AnswerOutput ( int SwitchReturn, double x1, double x2 )
     {
     switch (SwitchReturn)
         {
