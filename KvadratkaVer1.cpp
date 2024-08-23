@@ -2,8 +2,8 @@
 #include <stdio.h>
 #include <math.h>
 
-const int ALLNUMBERS = -1;                                                                  /*Глобальная переменная*/
-const double EPS = 1e-8;                                                                    /*Область погрешности*/
+const int ALLNUMBERS = -1;                                                                  /*The global variable of the solution is all numbers*/
+const double EPS = 1e-8;                                                                    /*The error of double numbers*/
 struct TestQuadraticSrtruct
     {
     int    NumberTest;
@@ -12,32 +12,32 @@ struct TestQuadraticSrtruct
     int    NumRootsSup;
     };
 
-int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 );            /*Обьявление функции, решающей квадратное уравнение*/
-int QuadraticInput ( double* a, double* b, double* c );                                     /*Обьявление функции ввода*/
-int AnswerOutput ( int SwitchReturn, double x1, double x2 );                                /*Обьявление функции вывода*/
-int TestQuadratic();
-int AppealToQuadratic( TestQuadraticSrtruct DataSet );                                                                       /*Обьявление функции, которая тестирует программу*/
-bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );
-bool CheckDoubleEquality( double Num1, double Num2 );
+int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 );            /*Declaration of the function solving the quadratic equation*/
+int QuadraticInput ( double* a, double* b, double* c );                                     /*Declaring the input function*/
+int AnswerOutput ( int SwitchReturn, double x1, double x2 );                                /*Declaring the output function*/
+int TestQuadratic();                                                                        /*Declaring a function that tests a quadratic equation*/
+int AppealToQuadratic( TestQuadraticSrtruct DataSet );                                      /*Declaration of a function that addresses the solution of a quadratic equation*/
+bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );  /*Declaring a function that checks the test values and the resulting*/
+bool CheckDoubleEquality( double Num1, double Num2 );                                       /*Declaring a function that compares numbers of the double type*/
 
 int main()
     {
-    /*-----------------------Модуль ввода данных------------------------------------------*/
     double a = 0, b = 0, c = 0;
     double x1 = 0, x2 = 0;
-    TestQuadratic();
-    QuadraticInput ( &a, &b, &c );
-    /*------------------------------------------------------------------------------------*/
 
-    /*-----------------------Модуль запроса на вывод результата---------------------------*/
+    TestQuadratic();                                                                        /*Testing Quadratic*/
+
+    QuadraticInput ( &a, &b, &c );                                                          /*Input*/
+
     int SwitchReturn = SolutionOfQuadratic( a, b, c, &x1, &x2 );
-    AnswerOutput ( SwitchReturn, x1, x2 );
-    /*------------------------------------------------------------------------------------*/
+
+    AnswerOutput ( SwitchReturn, x1, x2 );                                                  /*Output*/
+
     return 0;
     }
 
 
-    /*-----------------------Модуль вычисления(функция, которая будет находить корни)---- */
+    /*---------------Calculation module (a function that will find the roots)-------------*/
 int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
     {
     assert ( isfinite (a) );
@@ -99,7 +99,7 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
     /*------------------------------------------------------------------------------------*/
 
 
-    /*-------------------------Модуль ввода пользователем---------------------------------*/
+    /*---------------User input module----------------------------------------------------*/
 int QuadraticInput ( double* a, double* b, double* c )
     {
     int SuccessfulInput = 0;
@@ -124,7 +124,7 @@ int QuadraticInput ( double* a, double* b, double* c )
     }
     /*------------------------------------------------------------------------------------*/
 
-    /*-----------------------Модуль вывода результата-------------------------------------*/
+    /*---------------The output module of the result--------------------------------------*/
 int AnswerOutput ( int SwitchReturn, double x1, double x2 )
     {
     switch ( SwitchReturn )
@@ -148,33 +148,28 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
     }
     /*------------------------------------------------------------------------------------*/
 
-    /*-----------------------Модуль тестирования программы--------------------------------*/
+    /*---------------The program testing module-------------------------------------------*/
 int TestQuadratic()
     {
     int TestResult = 0;
-    TestQuadraticSrtruct Test1 = { 1, 0, 0, 0, NAN, NAN, ALLNUMBERS };
-    TestResult += AppealToQuadratic( Test1 );
+    const int NumOfTests = 8;
 
-    TestQuadraticSrtruct Test2 = { 2, 0, 0, 1, NAN, NAN, 0 };
-    TestResult += AppealToQuadratic( Test2 );
+    struct TestQuadraticSrtruct Array[NumOfTests] =
+    //** NumberTest,        a,      b,      c, x1Supposed, x2Supposed, NumRootsSup **//
+       {{         1,        0,      0,      0,        NAN,        NAN,  ALLNUMBERS },
+        {         2,        0,      0,      1,        NAN,        NAN,           0 },
+        {         3,        0,  10.01, -10.01,          1,        NAN,           1 },
+        {         4,      0.1,      0,   -2.5,          5,         -5,           2 },
+        {         5,      0.1,      0,    2.5,        NAN,        NAN,           0 },
+        {         6,      5.5,    -11,    5.5,          1,        NAN,           1 },
+        {         7,      5.5,    1.1,    5.5,        NAN,        NAN,           0 },
+        {         8,      5.5,   -5.5,-20.625,        2.5,       -1.5,           2 }
+       };
 
-    TestQuadraticSrtruct Test3 = { 3, 0, 10.01, -10.01, 1, NAN, 1 };
-    TestResult += AppealToQuadratic( Test3 );
-
-    TestQuadraticSrtruct Test4 = { 4, 0.1, 0, -2.5, 5, -5, 2 };
-    TestResult += AppealToQuadratic( Test4 );
-
-    TestQuadraticSrtruct Test5 = { 5, 0.1, 0, 2.5, NAN, NAN, 0 };
-    TestResult += AppealToQuadratic( Test5 );
-
-    TestQuadraticSrtruct Test6 = { 6, 5.5, -11, 5.5, 1, NAN, 1 };
-    TestResult += AppealToQuadratic( Test6 );
-
-    TestQuadraticSrtruct Test7 = { 7, 5.5, 1.1, 5.5, NAN, NAN, 0 };
-    TestResult += AppealToQuadratic( Test7 );
-
-    TestQuadraticSrtruct Test8 = { 8, 5.5, -5.5, -20.625, 2.5, -1.5, 2 };
-    TestResult += AppealToQuadratic( Test8 );
+    for (int i = 0; i < NumOfTests; i++ )
+        {
+        TestResult += AppealToQuadratic( Array[i] );
+        }
 
     assert ( TestResult == 0 );
     return 0;
@@ -226,7 +221,7 @@ bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRo
 
     /*------------------------------------------------------------------------------------*/
 
-    /*-----------------------Модуль проверки равенста double------------------------------*/
+    /*---------------The verification module is equal to double---------------------------*/
 bool CheckDoubleEquality( double Num1, double Num2 )
     {
      return fabs( Num1 - Num2) < EPS;
