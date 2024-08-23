@@ -18,6 +18,7 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 );                    
 int TestQuadratic();
 int AppealToQuadratic( TestQuadraticSrtruct DataSet );                                                                       /*Обьявление функции, которая тестирует программу*/
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );
+bool CheckDoubleEquality( double Num1, double Num2 );
 
 int main()
     {
@@ -48,11 +49,11 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
     *x1 = NAN;
     *x2 = NAN;
 
-    if ( fabs(a) < EPS )
+    if ( CheckDoubleEquality( a, 0 ) )
         {
-        if ( fabs(b) < EPS )
+        if ( CheckDoubleEquality( b, 0 ) )
             {
-            return ( fabs(c) < EPS )? ALLNUMBERS : 0;
+            return ( CheckDoubleEquality( c, 0 ) )? ALLNUMBERS : 0;
             }
         else
             {
@@ -62,13 +63,13 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
     }
     else
         {
-        if ( fabs(b) < EPS and (-c/a) >= 0 )
+        if ( CheckDoubleEquality( b, 0 ) and (-c/a) >= 0 )
             {
             *x1 =   sqrt(-c/a);
             *x2 = - sqrt(-c/a);
             return 2;
             }
-        if ( fabs(b) < EPS and (c/a) < 0 )
+        if ( CheckDoubleEquality( b, 0 ) and (c/a) < 0 )
             {
             return 0;
             }
@@ -76,7 +77,7 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
             {
             double discriminant = b*b - 4*a*c;
 
-            if ( fabs(discriminant) < EPS )
+            if ( CheckDoubleEquality( discriminant, 0 ) )
                 {
                 *x1 = (- b + sqrt(discriminant))/(2*a);
                 return 1;
@@ -204,7 +205,7 @@ int AppealToQuadratic( TestQuadraticSrtruct DataSet )
     }
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal )
     {
-    if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == 0 )
+    if (   NumRootsReal == DataSet.NumRootsSup and NumRootsReal == 0 )
         {
         return true;
         }
@@ -214,13 +215,21 @@ bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRo
         }
     else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == 1 )
         {
-        return x1 == DataSet.x1Supposed;
+        return CheckDoubleEquality( x1, DataSet.x1Supposed );
         }
     else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == 2 )
         {
-        return x1 == DataSet.x1Supposed and x2 == DataSet.x2Supposed;
+        return CheckDoubleEquality( x1, DataSet.x1Supposed ) and CheckDoubleEquality( x2, DataSet.x2Supposed );
         }
     return false;
+    }
+
+    /*------------------------------------------------------------------------------------*/
+
+    /*-----------------------Модуль проверки равенста double------------------------------*/
+bool CheckDoubleEquality( double Num1, double Num2 )
+    {
+     return fabs( Num1 - Num2) < EPS;
     }
 
     /*------------------------------------------------------------------------------------*/
