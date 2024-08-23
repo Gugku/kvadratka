@@ -12,24 +12,24 @@ struct TestQuadraticSrtruct
     int    NumRootsSup;
     };
 
-int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 );            /*Declaration of the function solving the quadratic equation*/
+int SolutionOfQuadratic ( double a, double b, double c, double* x1, double* x2 );           /*Declaration of the function solving the quadratic equation*/
+int LinearEquation ( double b, double c, double* x1 );                                      /*Declaring a function that solves a linear equation*/
+int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, double* x2 );   /*Declaration of a function that solves a quadratic equation, where a != 0*/
+int SucssefulTesting ( int TestQuadratic );                                                 /*The declaration of the function that draws conclusions from the function that runs the test*/
 int QuadraticInput ( double* a, double* b, double* c );                                     /*Declaring the input function*/
 int AnswerOutput ( int SwitchReturn, double x1, double x2 );                                /*Declaring the output function*/
 int TestQuadratic();                                                                        /*Declaring a function that tests a quadratic equation*/
-int AppealToQuadratic( TestQuadraticSrtruct DataSet );                                      /*Declaration of a function that addresses the solution of a quadratic equation*/
+int AppealToQuadratic ( TestQuadraticSrtruct DataSet );                                     /*Declaration of a function that addresses the solution of a quadratic equation*/
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );  /*Declaring a function that checks the test values and the resulting*/
-bool CheckDoubleEquality( double Num1, double Num2 );                                       /*Declaring a function that compares numbers of the double type*/
+bool CheckDoubleEquality ( double Num1, double Num2 );                                      /*Declaring a function that compares numbers of the double type*/
 
 int main()
     {
     double a = 0, b = 0, c = 0;
     double x1 = 0, x2 = 0;
 
-    if ( TestQuadratic () == 1 )                                                            /*Testing Quadratic*/
-        {
-        printf ( "Тесты не пройдены!\n" );
-        return 1;
-        }
+    SucssefulTesting ( TestQuadratic () );                                                  /*Testing Quadratic*/
+
     QuadraticInput ( &a, &b, &c );                                                          /*Input*/
 
     int SwitchReturn = SolutionOfQuadratic( a, b, c, &x1, &x2 );
@@ -54,7 +54,17 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
 
     if ( CheckDoubleEquality( a, 0 ) )
         {
-        if ( CheckDoubleEquality( b, 0 ) )
+        return LinearEquation( b, c, x1 );
+        }
+    else
+        {
+        return SolutionQuadraticNotLinnear ( a, b, c, x1, x2 );
+        }
+    }
+
+int LinearEquation ( double b, double c, double* x1 )
+    {
+    if ( CheckDoubleEquality( b, 0 ) )
             {
             return ( CheckDoubleEquality( c, 0 ) )? ALLNUMBERS : 0;
             }
@@ -64,21 +74,24 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
             return 1;
             }
     }
+
+int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, double* x2 )
+    {
+    if ( CheckDoubleEquality( b, 0 ) and (-c/a) >= 0 )
+        {
+        *x1 =   sqrt(-c/a);
+        *x2 = - sqrt(-c/a);
+        return 2;
+        }
+
+    else if ( CheckDoubleEquality( b, 0 ) and (c/a) < 0 )
+        {
+        return 0;
+        }
+
     else
         {
-        if ( CheckDoubleEquality( b, 0 ) and (-c/a) >= 0 )
-            {
-            *x1 =   sqrt(-c/a);
-            *x2 = - sqrt(-c/a);
-            return 2;
-            }
-        if ( CheckDoubleEquality( b, 0 ) and (c/a) < 0 )
-            {
-            return 0;
-            }
-        else
-            {
-            double discriminant = b*b - 4*a*c;
+        double discriminant = b*b - 4*a*c;
 
             if ( CheckDoubleEquality( discriminant, 0 ) )
                 {
@@ -96,9 +109,10 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
                 *x2 = (- b - sqrt(discriminant))/(2*a);
                 return 2;
                 }
-            }
         }
     }
+
+
 
     /*------------------------------------------------------------------------------------*/
 
@@ -157,6 +171,7 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
     /*---------------The program testing module-------------------------------------------*/
 int TestQuadratic()
     {
+    printf ( "Запущен тест, немного подождите..\n" );
     int TestResult = 0;
     const int NumOfTests = 8;
 
@@ -229,6 +244,20 @@ bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRo
         return CheckDoubleEquality( x1, DataSet.x1Supposed ) and CheckDoubleEquality( x2, DataSet.x2Supposed );
         }
     return false;
+    }
+
+int SucssefulTesting ( int TestQuadratic )
+    {
+    if ( TestQuadratic == 1 )
+        {
+        printf ( "Тесты не пройдены!\n" );
+        return 1;
+        }
+    else
+        {
+        printf ( "Тесты успешно пройдены!\n" );
+        return 0;
+        }
     }
 
     /*------------------------------------------------------------------------------------*/
