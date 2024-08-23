@@ -25,8 +25,11 @@ int main()
     double a = 0, b = 0, c = 0;
     double x1 = 0, x2 = 0;
 
-    TestQuadratic();                                                                        /*Testing Quadratic*/
-
+    if ( TestQuadratic () == 1 )                                                            /*Testing Quadratic*/
+        {
+        printf ( "Тесты не пройдены!\n" );
+        return 1;
+        }
     QuadraticInput ( &a, &b, &c );                                                          /*Input*/
 
     int SwitchReturn = SolutionOfQuadratic( a, b, c, &x1, &x2 );
@@ -96,6 +99,7 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
             }
         }
     }
+
     /*------------------------------------------------------------------------------------*/
 
 
@@ -122,6 +126,7 @@ int QuadraticInput ( double* a, double* b, double* c )
     printf  ( "Вы ввели: %lg, %lg, %lg\n", *a, *b, *c );
     return 0;
     }
+
     /*------------------------------------------------------------------------------------*/
 
     /*---------------The output module of the result--------------------------------------*/
@@ -146,6 +151,7 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
         }
     return 0;
     }
+
     /*------------------------------------------------------------------------------------*/
 
     /*---------------The program testing module-------------------------------------------*/
@@ -171,8 +177,14 @@ int TestQuadratic()
         TestResult += AppealToQuadratic( Array[i] );
         }
 
-    assert ( TestResult == 0 );
-    return 0;
+    if ( TestResult != 0 )
+        {
+        return 1;
+        }
+    else
+        {
+        return 0;
+        }
     }
 
 int AppealToQuadratic( TestQuadraticSrtruct DataSet )
