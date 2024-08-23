@@ -28,7 +28,8 @@ int main()
     double a = 0, b = 0, c = 0;
     double x1 = 0, x2 = 0;
 
-    SucssefulTesting ( TestQuadratic () );                                                  /*Testing Quadratic*/
+    if (SucssefulTesting ( TestQuadratic () ) == 1)                                         /*Testing Quadratic*/
+        return 1;
 
     QuadraticInput ( &a, &b, &c );                                                          /*Input*/
 
@@ -64,6 +65,12 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
 
 int LinearEquation ( double b, double c, double* x1 )
     {
+
+    assert ( isfinite (b) );
+    assert ( isfinite (c) );
+    assert ( x1 != NULL );
+    *x1 = NAN;
+
     if ( CheckDoubleEquality( b, 0 ) )
             {
             return ( CheckDoubleEquality( c, 0 ) )? ALLNUMBERS : 0;
@@ -77,38 +84,33 @@ int LinearEquation ( double b, double c, double* x1 )
 
 int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, double* x2 )
     {
-    if ( CheckDoubleEquality( b, 0 ) and (-c/a) >= 0 )
+
+    assert ( isfinite (a) );
+    assert ( isfinite (b) );
+    assert ( isfinite (c) );
+    assert ( x1 != NULL );
+    assert ( x2 != NULL );
+    assert ( x1 != x2 );
+    *x1 = NAN;
+    *x2 = NAN;
+
+    double discriminant = b*b - 4*a*c;
+
+    if ( CheckDoubleEquality( discriminant, 0 ) )
         {
-        *x1 =   sqrt(-c/a);
-        *x2 = - sqrt(-c/a);
-        return 2;
+        *x1 = (- b + sqrt(discriminant))/(2*a);
+        return 1;
         }
 
-    else if ( CheckDoubleEquality( b, 0 ) and (c/a) < 0 )
+    else if ( discriminant < 0 )
         {
         return 0;
         }
-
     else
         {
-        double discriminant = b*b - 4*a*c;
-
-            if ( CheckDoubleEquality( discriminant, 0 ) )
-                {
-                *x1 = (- b + sqrt(discriminant))/(2*a);
-                return 1;
-                }
-
-            else if ( discriminant < 0 )
-                {
-                return 0;
-                }
-            else
-                {
-                *x1 = (- b + sqrt(discriminant))/(2*a);
-                *x2 = (- b - sqrt(discriminant))/(2*a);
-                return 2;
-                }
+        *x1 = (- b + sqrt(discriminant))/(2*a);
+        *x2 = (- b - sqrt(discriminant))/(2*a);
+        return 2;
         }
     }
 
@@ -255,7 +257,7 @@ int SucssefulTesting ( int TestQuadratic )
         }
     else
         {
-        printf ( "Тесты успешно пройдены!\n" );
+        printf ( "Тесты успешно пройдены!\n\n" );
         return 0;
         }
     }
