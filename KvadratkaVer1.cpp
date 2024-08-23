@@ -2,7 +2,6 @@
 #include <stdio.h>
 #include <math.h>
 
-const int ALLNUMBERS = -1;                                                                  /*The global variable of the solution is all numbers*/
 const double EPS = 1e-8;                                                                    /*The error of double numbers*/
 struct TestQuadraticSrtruct
     {
@@ -10,6 +9,13 @@ struct TestQuadraticSrtruct
     double a, b, c;
     double x1Supposed, x2Supposed;
     int    NumRootsSup;
+    };
+enum processrezult                                                                          /*The ability to convey the number of solutions in words*/
+    {
+    AllNumbers = -1,
+    NoRoots,
+    OneRoots,
+    TwoRoots
     };
 
 int SolutionOfQuadratic ( double a, double b, double c, double* x1, double* x2 );           /*Declaration of the function solving the quadratic equation*/
@@ -73,12 +79,12 @@ int LinearEquation ( double b, double c, double* x1 )
 
     if ( CheckDoubleEquality( b, 0 ) )
             {
-            return ( CheckDoubleEquality( c, 0 ) )? ALLNUMBERS : 0;
+            return ( CheckDoubleEquality( c, 0 ) )? AllNumbers : NoRoots;
             }
         else
             {
             *x1 = -c / b;
-            return 1;
+            return OneRoots;
             }
     }
 
@@ -99,18 +105,18 @@ int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, doub
     if ( CheckDoubleEquality( discriminant, 0 ) )
         {
         *x1 = (- b + sqrt(discriminant))/(2*a);
-        return 1;
+        return OneRoots;
         }
 
     else if ( discriminant < 0 )
         {
-        return 0;
+        return NoRoots;
         }
     else
         {
         *x1 = (- b + sqrt(discriminant))/(2*a);
         *x2 = (- b - sqrt(discriminant))/(2*a);
-        return 2;
+        return TwoRoots;
         }
     }
 
@@ -150,16 +156,16 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
     {
     switch ( SwitchReturn )
         {
-        case 0: printf("Нет решений\n");
+        case  NoRoots: printf("Нет решений\n");
                 break;
 
-        case 1: printf("x = %lg\n", x1);
+        case  OneRoots: printf("x = %lg\n", x1);
                 break;
 
-        case 2: printf("x1 = %lg, x2 = %lg\n", x1, x2);
+        case  TwoRoots: printf("x1 = %lg, x2 = %lg\n", x1, x2);
                 break;
 
-        case ALLNUMBERS: printf("Решением является любое число");
+        case  AllNumbers: printf("Решением является любое число");
                 break;
 
         default: printf ("main(): ERROR: SwitchReturn = %d\n", SwitchReturn);
@@ -179,14 +185,14 @@ int TestQuadratic()
 
     struct TestQuadraticSrtruct Array[NumOfTests] =
     //** NumberTest,        a,      b,      c, x1Supposed, x2Supposed, NumRootsSup **//
-       {{         1,        0,      0,      0,        NAN,        NAN,  ALLNUMBERS },
-        {         2,        0,      0,      1,        NAN,        NAN,           0 },
-        {         3,        0,  10.01, -10.01,          1,        NAN,           1 },
-        {         4,      0.1,      0,   -2.5,          5,         -5,           2 },
-        {         5,      0.1,      0,    2.5,        NAN,        NAN,           0 },
-        {         6,      5.5,    -11,    5.5,          1,        NAN,           1 },
-        {         7,      5.5,    1.1,    5.5,        NAN,        NAN,           0 },
-        {         8,      5.5,   -5.5,-20.625,        2.5,       -1.5,           2 }
+       {{         1,        0,      0,      0,        NAN,        NAN,  AllNumbers },
+        {         2,        0,      0,      1,        NAN,        NAN,     NoRoots },
+        {         3,        0,  10.01, -10.01,          1,        NAN,    OneRoots },
+        {         4,      0.1,      0,   -2.5,          5,         -5,    TwoRoots },
+        {         5,      0.1,      0,    2.5,        NAN,        NAN,     NoRoots },
+        {         6,      5.5,    -11,    5.5,          1,        NAN,    OneRoots },
+        {         7,      5.5,    1.1,    5.5,        NAN,        NAN,     NoRoots },
+        {         8,      5.5,   -5.5,-20.625,        2.5,       -1.5,    TwoRoots }
        };
 
     for (int i = 0; i < NumOfTests; i++ )
@@ -229,19 +235,19 @@ int AppealToQuadratic( TestQuadraticSrtruct DataSet )
     }
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal )
     {
-    if (   NumRootsReal == DataSet.NumRootsSup and NumRootsReal == 0 )
+    if      ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == NoRoots )
         {
         return true;
         }
-    else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == ALLNUMBERS )
+    else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == AllNumbers )
         {
         return true;
         }
-    else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == 1 )
+    else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == OneRoots )
         {
         return CheckDoubleEquality( x1, DataSet.x1Supposed );
         }
-    else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == 2 )
+    else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == TwoRoots )
         {
         return CheckDoubleEquality( x1, DataSet.x1Supposed ) and CheckDoubleEquality( x2, DataSet.x2Supposed );
         }
