@@ -183,7 +183,7 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
     /*---------------The program testing module-------------------------------------------*/
 int TestQuadratic()
     {
-    printf ( "Запущен тест, немного подождите..\n" );
+    printf ( "Запущены тесты, немного подождите..\n" );
     int TestResult = 0;
     const int NumOfTests = 8;
 
@@ -299,12 +299,17 @@ int FuncFileReader ()
         int fscresult = fscanf ( DataFile, "%d,%lg,%lg,%lg,%lg,%lg,%d", &(FileStruct.NumberTest), &(FileStruct.a), &(FileStruct.b), &(FileStruct.c),
             &(FileStruct.x1Supposed), &(FileStruct.x2Supposed), &(FileStruct.NumRootsSup) );
         printf("Принято значений из файла: %d\n",fscresult);
-
-        printf ( "Тест из файла успешно пройден.\n\n");
-        AppealToQuadratic( FileStruct );
-        fclose ( DataFile );
-        DataFile = NULL;
-        return Sucsess;
+        if ( AppealToQuadratic( FileStruct ) == Sucsess)
+            {
+            printf ( "Тест из файла успешно пройден.\n\n");
+            fclose ( DataFile );
+            DataFile = NULL;
+            return Sucsess;
+            }
+        else
+            {
+            return Failure;
+            }
         }
 
     }
