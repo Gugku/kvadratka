@@ -10,12 +10,17 @@ struct TestQuadraticSrtruct
     double x1Supposed, x2Supposed;
     int    NumRootsSup;
     };
-enum processrezult                                                                          /*The ability to convey the number of solutions in words*/
+enum quadraticresult                                                                        /*The ability to convey the number of solutions in words*/
     {
     AllNumbers = -1,
     NoRoots,
-    OneRoots,
+    OneRoot,
     TwoRoots
+    };
+enum processresult                                                                          /*The ability to convey the process result in words*/
+    {
+    Sucsess = 0,
+    Failure
     };
 
 int SolutionOfQuadratic ( double a, double b, double c, double* x1, double* x2 );           /*Declaration of the function solving the quadratic equation*/
@@ -26,6 +31,7 @@ int QuadraticInput ( double* a, double* b, double* c );                         
 int AnswerOutput ( int SwitchReturn, double x1, double x2 );                                /*Declaring the output function*/
 int TestQuadratic();                                                                        /*Declaring a function that tests a quadratic equation*/
 int AppealToQuadratic ( TestQuadraticSrtruct DataSet );                                     /*Declaration of a function that addresses the solution of a quadratic equation*/
+int FuncFileReader ();                                                                      /*Declaring of a function that open file with test*/
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );  /*Declaring a function that checks the test values and the resulting*/
 bool CheckDoubleEquality ( double Num1, double Num2 );                                      /*Declaring a function that compares numbers of the double type*/
 
@@ -34,8 +40,10 @@ int main()
     double a = 0, b = 0, c = 0;
     double x1 = 0, x2 = 0;
 
+    FuncFileReader ();
+
     if (SucssefulTesting ( TestQuadratic () ) == 1)                                         /*Testing Quadratic*/
-        return 1;
+        return Failure;
 
     QuadraticInput ( &a, &b, &c );                                                          /*Input*/
 
@@ -43,7 +51,7 @@ int main()
 
     AnswerOutput ( SwitchReturn, x1, x2 );                                                  /*Output*/
 
-    return 0;
+    return Sucsess;
     }
 
 
@@ -56,8 +64,6 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
     assert ( x1 != NULL );
     assert ( x2 != NULL );
     assert ( x1 != x2 );
-    *x1 = NAN;
-    *x2 = NAN;
 
     if ( CheckDoubleEquality( a, 0 ) )
         {
@@ -75,7 +81,6 @@ int LinearEquation ( double b, double c, double* x1 )
     assert ( isfinite (b) );
     assert ( isfinite (c) );
     assert ( x1 != NULL );
-    *x1 = NAN;
 
     if ( CheckDoubleEquality( b, 0 ) )
             {
@@ -84,7 +89,7 @@ int LinearEquation ( double b, double c, double* x1 )
         else
             {
             *x1 = -c / b;
-            return OneRoots;
+            return OneRoot;
             }
     }
 
@@ -97,15 +102,13 @@ int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, doub
     assert ( x1 != NULL );
     assert ( x2 != NULL );
     assert ( x1 != x2 );
-    *x1 = NAN;
-    *x2 = NAN;
 
     double discriminant = b*b - 4*a*c;
 
     if ( CheckDoubleEquality( discriminant, 0 ) )
         {
-        *x1 = (- b + sqrt(discriminant))/(2*a);
-        return OneRoots;
+        *x1 = - b / (2*a);
+        return OneRoot;
         }
 
     else if ( discriminant < 0 )
@@ -114,8 +117,9 @@ int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, doub
         }
     else
         {
-        *x1 = (- b + sqrt(discriminant))/(2*a);
-        *x2 = (- b - sqrt(discriminant))/(2*a);
+        double DisSqrt = sqrt(discriminant);
+        *x1 = (- b + DisSqrt)/(2*a);
+        *x2 = (- b - DisSqrt)/(2*a);
         return TwoRoots;
         }
     }
@@ -142,11 +146,11 @@ int QuadraticInput ( double* a, double* b, double* c )
                 DelBuffer = getchar();
                 }
 
-            printf ( "\n#Вы ввели неверные значения, попробуйте еще раз.\n\n" );
+            printf ( "\nВы ввели неверные значения, попробуйте еще раз.\n\n" );
             }
         }
     printf  ( "Вы ввели: %lg, %lg, %lg\n", *a, *b, *c );
-    return 0;
+    return Sucsess;
     }
 
     /*------------------------------------------------------------------------------------*/
@@ -159,7 +163,7 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
         case  NoRoots: printf("Нет решений\n");
                 break;
 
-        case  OneRoots: printf("x = %lg\n", x1);
+        case  OneRoot: printf("x = %lg\n", x1);
                 break;
 
         case  TwoRoots: printf("x1 = %lg, x2 = %lg\n", x1, x2);
@@ -169,9 +173,9 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
                 break;
 
         default: printf ("main(): ERROR: SwitchReturn = %d\n", SwitchReturn);
-                return 1;
+                return Failure;
         }
-    return 0;
+    return Sucsess;
     }
 
     /*------------------------------------------------------------------------------------*/
@@ -187,10 +191,10 @@ int TestQuadratic()
     //** NumberTest,        a,      b,      c, x1Supposed, x2Supposed, NumRootsSup **//
        {{         1,        0,      0,      0,        NAN,        NAN,  AllNumbers },
         {         2,        0,      0,      1,        NAN,        NAN,     NoRoots },
-        {         3,        0,  10.01, -10.01,          1,        NAN,    OneRoots },
+        {         3,        0,  10.01, -10.01,          1,        NAN,     OneRoot },
         {         4,      0.1,      0,   -2.5,          5,         -5,    TwoRoots },
         {         5,      0.1,      0,    2.5,        NAN,        NAN,     NoRoots },
-        {         6,      5.5,    -11,    5.5,          1,        NAN,    OneRoots },
+        {         6,      5.5,    -11,    5.5,          1,        NAN,     OneRoot },
         {         7,      5.5,    1.1,    5.5,        NAN,        NAN,     NoRoots },
         {         8,      5.5,   -5.5,-20.625,        2.5,       -1.5,    TwoRoots }
        };
@@ -202,11 +206,11 @@ int TestQuadratic()
 
     if ( TestResult != 0 )
         {
-        return 1;
+        return Failure;
         }
     else
         {
-        return 0;
+        return Sucsess;
         }
     }
 
@@ -226,11 +230,11 @@ int AppealToQuadratic( TestQuadraticSrtruct DataSet )
             DataSet.NumberTest, DataSet.a, DataSet.b, DataSet.c,
             DataSet.x1Supposed, DataSet.x2Supposed, DataSet.NumRootsSup, x1, x2, NumRootsReal
             );
-        return 1;
+        return Failure;
         }
     else
         {
-        return 0;
+        return Sucsess;
         }
     }
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal )
@@ -243,7 +247,7 @@ bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRo
         {
         return true;
         }
-    else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == OneRoots )
+    else if ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == OneRoot  )
         {
         return CheckDoubleEquality( x1, DataSet.x1Supposed );
         }
@@ -259,12 +263,12 @@ int SucssefulTesting ( int TestQuadratic )
     if ( TestQuadratic == 1 )
         {
         printf ( "Тесты не пройдены!\n" );
-        return 1;
+        return Failure;
         }
     else
         {
         printf ( "Тесты успешно пройдены!\n\n" );
-        return 0;
+        return Sucsess;
         }
     }
 
@@ -277,3 +281,32 @@ bool CheckDoubleEquality( double Num1, double Num2 )
     }
 
     /*------------------------------------------------------------------------------------*/
+
+    /*---------------Test File Reader Module----------------------------------------------*/
+int FuncFileReader ()
+    {
+    struct TestQuadraticSrtruct FileStruct;
+
+    FILE *DataFile;
+    DataFile = fopen ( "TestArray.txt", "r" );
+    if ( DataFile == NULL )
+        {
+        perror ( "Не удалось открыть файл!\n" );
+        return Failure;
+        }
+    else
+        {
+        int fscresult = fscanf ( DataFile, "%d,%lg,%lg,%lg,%lg,%lg,%d", &(FileStruct.NumberTest), &(FileStruct.a), &(FileStruct.b), &(FileStruct.c),
+            &(FileStruct.x1Supposed), &(FileStruct.x2Supposed), &(FileStruct.NumRootsSup) );
+        printf("Принято значений из файла: %d\n",fscresult);
+
+        printf ( "Тест из файла успешно пройден.\n\n");
+        AppealToQuadratic( FileStruct );
+        fclose ( DataFile );
+        DataFile = NULL;
+        return Sucsess;
+        }
+
+    }
+    /*------------------------------------------------------------------------------------*/
+
