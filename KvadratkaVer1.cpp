@@ -19,7 +19,7 @@ enum quadraticresult                                                            
     };
 enum processresult                                                                          /*The ability to convey the process result in words*/
     {
-    Sucsess = 0,
+    Success = 0,
     Failure
     };
 
@@ -32,6 +32,9 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 );                    
 int TestQuadratic();                                                                        /*Declaring a function that tests a quadratic equation*/
 int AppealToQuadratic ( TestQuadraticSrtruct DataSet );                                     /*Declaration of a function that addresses the solution of a quadratic equation*/
 int FuncFileReader ();                                                                      /*Declaring of a function that open file with test*/
+int FileTestSuccess ( FILE *DataFile );                                                     /*Declaring of a function that print file test success*/
+int FileTestFailure ( FILE *DataFile );                                                     /*Declaring of a function that print file test failure*/
+int CloseFile ( FILE *DataFile);                                                            /*Declaring of a function that close file*/
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );  /*Declaring a function that checks the test values and the resulting*/
 bool CheckDoubleEquality ( double Num1, double Num2 );                                      /*Declaring a function that compares numbers of the double type*/
 
@@ -51,7 +54,7 @@ int main()
 
     AnswerOutput ( SwitchReturn, x1, x2 );                                                  /*Output*/
 
-    return Sucsess;
+    return Success;
     }
 
 
@@ -150,7 +153,7 @@ int QuadraticInput ( double* a, double* b, double* c )
             }
         }
     printf  ( "Вы ввели: %lg, %lg, %lg\n", *a, *b, *c );
-    return Sucsess;
+    return Success;
     }
 
     /*------------------------------------------------------------------------------------*/
@@ -175,7 +178,7 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
         default: printf ("main(): ERROR: SwitchReturn = %d\n", SwitchReturn);
                 return Failure;
         }
-    return Sucsess;
+    return Success;
     }
 
     /*------------------------------------------------------------------------------------*/
@@ -210,7 +213,7 @@ int TestQuadratic()
         }
     else
         {
-        return Sucsess;
+        return Success;
         }
     }
 
@@ -234,7 +237,7 @@ int AppealToQuadratic( TestQuadraticSrtruct DataSet )
         }
     else
         {
-        return Sucsess;
+        return Success;
         }
     }
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal )
@@ -268,7 +271,7 @@ int SucssefulTesting ( int TestQuadratic )
     else
         {
         printf ( "Тесты успешно пройдены!\n\n" );
-        return Sucsess;
+        return Success;
         }
     }
 
@@ -296,22 +299,69 @@ int FuncFileReader ()
         }
     else
         {
-        int fscresult = fscanf ( DataFile, "%d,%lg,%lg,%lg,%lg,%lg,%d", &(FileStruct.NumberTest), &(FileStruct.a), &(FileStruct.b), &(FileStruct.c),
-            &(FileStruct.x1Supposed), &(FileStruct.x2Supposed), &(FileStruct.NumRootsSup) );
-        printf("Принято значений из файла: %d\n",fscresult);
-        if ( AppealToQuadratic( FileStruct ) == Sucsess)
+        int fscresult = 0;
+        int FileTestsSuccesscorFailure = 0;
+        int EndFile = 0;
+        while ( (EndFile = fscanf ( DataFile, "%d,%lg,%lg,%lg,%lg,%lg,%d\n", &(FileStruct.NumberTest), &(FileStruct.a), &(FileStruct.b), &(FileStruct.c),
+            &(FileStruct.x1Supposed), &(FileStruct.x2Supposed), &(FileStruct.NumRootsSup) )) != EOF )
             {
-            printf ( "Тест из файла успешно пройден.\n\n");
-            fclose ( DataFile );
-            DataFile = NULL;
-            return Sucsess;
+            if (EndFile != 7)
+                {
+                FileTestsSuccesscorFailure += Failure;
+                printf ("Тест в файле имеет неверный вид!\n");
+                break;
+                }
+            else
+                {
+                FileTestsSuccesscorFailure += AppealToQuadratic( FileStruct );
+                fscresult += EndFile;
+                }
+            }
+        printf ("Успешно считанных переменных: %d\n", fscresult);
+
+        if ( FileTestsSuccesscorFailure == Success)
+            {
+            return FileTestSuccess ( DataFile );
             }
         else
             {
-            return Failure;
+            return FileTestFailure ( DataFile );
             }
         }
 
     }
+
+    /*------------------------------------------------------------------------------------*/
+
+int FileTestSuccess ( FILE *DataFile )
+    {
+    printf ( "Тест из файла успешно пройден.\n");
+    return CloseFile ( DataFile );
+    }
+
+int FileTestFailure ( FILE *DataFile )
+    {
+    printf ( "Тест из файла провален!\n" );
+    CloseFile ( DataFile );
+    return Failure;
+    }
+
+    /*---------------Close File Function--------------------------------------------------*/
+
+int CloseFile ( FILE *DataFile)
+    {
+    fclose ( DataFile );
+    if ( DataFile != NULL )
+        {
+        printf ( "Файл успешно закрыт.\n\n" );
+        return Success;
+        }
+    else
+        {
+        perror ( "ERROR: Файл не закрыт!\n\n" );
+        return Failure;
+        }
+    }
+
     /*------------------------------------------------------------------------------------*/
 
