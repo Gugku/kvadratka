@@ -2,7 +2,22 @@
 #include <stdio.h>
 #include <math.h>
 
-const double EPS = 1e-8;                                                                    /*The error of double numbers*/
+
+
+const double EPS = 1e-8;       ///< The error of double number
+
+/*!
+    *   @brief The ability to convey the number of solutions in words
+    *   @param NumberTest           Number Test type int
+    *   @param a                    The first  coefficient of the quadratic equation type double
+    *   @param b                    The second coefficient of the quadratic equation type double
+    *   @param c                    The third  coefficient of the quadratic equation type double
+    *   @param x1Supposed           The first  supposed root type double
+    *   @param x2Supposed           The second supposed root type double
+    *   @param NumRootsSup          The quantity supposed roots type int
+    *   @author LZK
+*/
+
 struct TestQuadraticSrtruct
     {
     int    NumberTest;
@@ -10,37 +25,60 @@ struct TestQuadraticSrtruct
     double x1Supposed, x2Supposed;
     int    NumRootsSup;
     };
+
+ /*!
+    *   @enum quadraticresult
+    *   @brief The ability to convey the number of solutions in words
+    *   @author LZK
+*/
+
 enum quadraticresult                                                                        /*The ability to convey the number of solutions in words*/
     {
-    AllNumbers = -1,
-    NoRoots,
-    OneRoot,
-    TwoRoots
-    };
-enum processresult                                                                          /*The ability to convey the process result in words*/
-    {
-    Success = 0,
-    Failure
+    AllNumbers = -1,        ///< -1
+    NoRoots,                ///<  0
+    OneRoot,                ///<  1
+    TwoRoots                ///<  2
     };
 
-int SolutionOfQuadratic ( double a, double b, double c, double* x1, double* x2 );           /*Declaration of the function solving the quadratic equation*/
-int LinearEquation ( double b, double c, double* x1 );                                      /*Declaration a function that solves a linear equation*/
-int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, double* x2 );   /*Declaration of a function that solves a quadratic equation, where a != 0*/
-int SucssefulTesting ( int TestQuadratic );                                                 /*Declaration of the function that draws conclusions from the function that runs the test*/
-int QuadraticInput ( double* a, double* b, double* c );                                     /*Declaration the input function*/
-int AnswerOutput ( int SwitchReturn, double x1, double x2 );                                /*Declaration the output function*/
-int TestQuadratic();                                                                        /*Declaration a function that tests a quadratic equation*/
-int AppealToQuadratic ( TestQuadraticSrtruct DataSet );                                     /*Declaration of a function that addresses the solution of a quadratic equation*/
-int FuncFileReader();                                                                       /*Declaration of a function that open file with test*/
-int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsNumFailure );              /*Declaration of a function that scan test file*/
-int FileTestSuccess ( FILE *DataFile );                                                     /*Declaration of a function that print file test success*/
-int FileTestFailure ( FILE *DataFile );                                                     /*Declaration of a function that print file test failure*/
-int CloseFile ( FILE *DataFile);                                                            /*Declaration of a function that close file*/
-bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );  /*Declaration a function that checks the test values and the resulting*/
-bool CheckDoubleEquality ( double Num1, double Num2 );                                      /*Declaration a function that compares numbers of the double type*/
+/*!
+    *   @enum processresult
+    *   @brief The ability to convey the process result in words
+    *   @author LZK
+*/
+
+enum processresult                                                                          /*The ability to convey the process result in words*/
+    {
+    Success = 0,            ///<  0
+    Failure                 ///<  1
+    };
+
+int SolutionOfQuadratic ( double a, double b, double c, double* x1, double* x2 );           ///< The function solving the quadratic equation
+int LinearEquation ( double b, double c, double* x1 );                                      ///< The function that solves a linear equation
+int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, double* x2 );   ///< The function that solves a quadratic equation, where a != 0
+int SucssefulTesting ( int TestQuadratic );                                                 ///< The function that draws conclusions from the function that runs the test
+int QuadraticInput ( double* a, double* b, double* c );                                     ///< The input function
+int AnswerOutput ( int SwitchReturn, double x1, double x2 );                                ///< The output function
+int TestQuadratic();                                                                        ///< The function that tests a quadratic equation
+int AppealToQuadratic ( TestQuadraticSrtruct DataSet );                                     ///< The function that addresses the solution of a quadratic equation
+int FuncFileReader();                                                                       ///< The function that open file with test
+int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsNumFailure );              ///< The function that scan test file
+int FileTestSuccess ( FILE *DataFile );                                                     ///< The function that print file test success
+int FileTestFailure ( FILE *DataFile );                                                     ///< The function that print file test failure
+int CloseFile ( FILE *DataFile);                                                            ///< The function that close file
+bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );  ///< The function that checks the test values and the resulting
+bool CheckDoubleEquality ( double Num1, double Num2 );                                      ///< The function that compares numbers of the double type
 
 
     /*---------------Main-----------------------------------------------------------------*/
+
+/*!
+    * @param a      The first  coefficient of the quadratic equation
+    * @param b      The second coefficient of the quadratic equation
+    * @param c      The third  coefficient of the quadratic equation
+    * @param x1     The root of the equation
+    * @param x2     The root of the equation
+    * @author LZK
+    */
 
 int main()
     {
@@ -49,8 +87,10 @@ int main()
 
     FuncFileReader ();
 
-    if (SucssefulTesting ( TestQuadratic () ) == Success)                                   /*Testing Quadratic*/
+    if (SucssefulTesting ( TestQuadratic () ) == Failure)                                   /*Testing Quadratic*/
+        {
         return Failure;
+        }
 
     QuadraticInput ( &a, &b, &c );                                                          /*Input*/
 
@@ -64,6 +104,19 @@ int main()
     /*------------------------------------------------------------------------------------*/
 
     /*---------------Calculation module (a function that will find the roots)-------------*/
+
+/*!
+    * @brief        Solves a quadratic equation by dividing into linear and non-linear cases
+    * @param a  [in]     The first  coefficient of the quadratic equation
+    * @param b  [in]     The second coefficient of the quadratic equation
+    * @param c  [in]     The third  coefficient of the quadratic equation
+    * @param x1 [out]    Adress to the root of the equation
+    * @param x2 [out]    Adress to the root of the equation
+    * @retval LinearEquation( b, c, x1 ) If a == 0
+    * @retval SolutionQuadraticNotLinnear ( a, b, c, x1, x2 ) If a != 0
+    * @author LZK
+    */
+
 int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
     {
     assert ( isfinite (a) );
@@ -83,6 +136,13 @@ int SolutionOfQuadratic( double a, double b, double c, double* x1, double* x2 )
         }
     }
 
+/*!
+    * @brief        Linear case a = 0
+    * @param b  [in]     The second coefficient of the quadratic equation
+    * @param c  [in]     The third  coefficient of the quadratic equation
+    * @param x1 [out]    Adress to the root of the equation
+*/
+
 int LinearEquation ( double b, double c, double* x1 )
     {
 
@@ -100,6 +160,15 @@ int LinearEquation ( double b, double c, double* x1 )
             return OneRoot;
             }
     }
+
+/*!
+    * @brief        Quadratic case a != 0
+    * @param a  [in]     The first  coefficient of the quadratic equation
+    * @param b  [in]     The second coefficient of the quadratic equation
+    * @param c  [in]     The third  coefficient of the quadratic equation
+    * @param x1 [out]    Adress to the root of the equation
+    * @param x2 [out]    Adress to the root of the equation
+*/
 
 int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, double* x2 )
     {
@@ -336,12 +405,13 @@ int FileTestFailure ( FILE *DataFile )
 
 int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsNumFailure )
     {
-    struct TestQuadraticSrtruct FileStruct;
+    struct TestQuadraticSrtruct FileStruct = {};
     int EndFile = 0;
+    const int NumParamFile = 7;
     while ( (EndFile = fscanf ( DataFile, "%d,%lg,%lg,%lg,%lg,%lg,%d\n", &(FileStruct.NumberTest), &(FileStruct.a), &(FileStruct.b), &(FileStruct.c),
         &(FileStruct.x1Supposed), &(FileStruct.x2Supposed), &(FileStruct.NumRootsSup) )) != EOF )
         {
-        if (EndFile != 7)
+        if (EndFile != NumParamFile )
             {
             *FileTestsNumFailure += 1;
             printf ("Тест в файле имеет неверный вид!\n");
