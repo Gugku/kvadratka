@@ -23,7 +23,6 @@ enum processresult                                                              
     Failure
     };
 
-int ProgramSolutionQuadratic();                                                             /*Declaration of a function that begins the program solving a quadratic equation*/
 int SolutionOfQuadratic ( double a, double b, double c, double* x1, double* x2 );           /*Declaration of the function solving the quadratic equation*/
 int LinearEquation ( double b, double c, double* x1 );                                      /*Declaration a function that solves a linear equation*/
 int SolutionQuadraticNotLinnear ( double a, double b, double c, double* x1, double* x2 );   /*Declaration of a function that solves a quadratic equation, where a != 0*/
@@ -33,28 +32,24 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 );                    
 int TestQuadratic();                                                                        /*Declaration a function that tests a quadratic equation*/
 int AppealToQuadratic ( TestQuadraticSrtruct DataSet );                                     /*Declaration of a function that addresses the solution of a quadratic equation*/
 int FuncFileReader();                                                                       /*Declaration of a function that open file with test*/
-int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsSuccesscorFailure );       /*Declaration of a function that scan test file*/
+int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsNumFailure );              /*Declaration of a function that scan test file*/
 int FileTestSuccess ( FILE *DataFile );                                                     /*Declaration of a function that print file test success*/
 int FileTestFailure ( FILE *DataFile );                                                     /*Declaration of a function that print file test failure*/
 int CloseFile ( FILE *DataFile);                                                            /*Declaration of a function that close file*/
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );  /*Declaration a function that checks the test values and the resulting*/
 bool CheckDoubleEquality ( double Num1, double Num2 );                                      /*Declaration a function that compares numbers of the double type*/
 
+
+    /*---------------Main-----------------------------------------------------------------*/
+
 int main()
-    {
-    return ProgramSolutionQuadratic();
-    }
-
-    /*---------------Program solution quadratic-------------------------------------------*/
-
-int ProgramSolutionQuadratic()
     {
     double a = 0, b = 0, c = 0;
     double x1 = 0, x2 = 0;
 
     FuncFileReader ();
 
-    if (SucssefulTesting ( TestQuadratic () ) == 1)                                         /*Testing Quadratic*/
+    if (SucssefulTesting ( TestQuadratic () ) == Success)                                   /*Testing Quadratic*/
         return Failure;
 
     QuadraticInput ( &a, &b, &c );                                                          /*Input*/
@@ -250,6 +245,7 @@ int AppealToQuadratic( TestQuadraticSrtruct DataSet )
         return Success;
         }
     }
+
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal )
     {
     if      ( NumRootsReal == DataSet.NumRootsSup and NumRootsReal == NoRoots )
@@ -299,7 +295,7 @@ bool CheckDoubleEquality( double Num1, double Num2 )
 int FuncFileReader ()
     {
 
-    FILE *DataFile;
+    FILE *DataFile = NULL;
     DataFile = fopen ( "TestArray.txt", "r" );
     if ( DataFile == NULL )
         {
@@ -309,11 +305,11 @@ int FuncFileReader ()
     else
         {
         int fscresult = 0;
-        int FileTestsSuccesscorFailure = 0;
-        ScanTestFile( DataFile, &fscresult, &FileTestsSuccesscorFailure );
+        int FileTestsNumFailure = 0;
+        ScanTestFile( DataFile, &fscresult, &FileTestsNumFailure );
         printf ("Успешно считанных переменных из файла: %d\n", fscresult);
 
-        if ( FileTestsSuccesscorFailure == Success)
+        if ( FileTestsNumFailure == 0 )
             {
             return FileTestSuccess ( DataFile );
             }
@@ -338,7 +334,7 @@ int FileTestFailure ( FILE *DataFile )
     return Failure;
     }
 
-int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsSuccesscorFailure )
+int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsNumFailure )
     {
     struct TestQuadraticSrtruct FileStruct;
     int EndFile = 0;
@@ -347,13 +343,13 @@ int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsSuccesscorFailu
         {
         if (EndFile != 7)
             {
-            *FileTestsSuccesscorFailure += Failure;
+            *FileTestsNumFailure += 1;
             printf ("Тест в файле имеет неверный вид!\n");
             break;
             }
         else
             {
-            *FileTestsSuccesscorFailure += AppealToQuadratic( FileStruct );
+            *FileTestsNumFailure += AppealToQuadratic( FileStruct );
             *fscresult += EndFile;
             }
         }
