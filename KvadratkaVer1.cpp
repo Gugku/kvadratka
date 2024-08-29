@@ -2,7 +2,10 @@
 #include <stdio.h>
 #include <math.h>
 
-
+#define RED(print) "\033[1;31m" print "\033[0m"
+#define GREEN(print)  "\033[1;32m" print "\033[0m"
+#define YELLOW(print)  "\033[1;33m" print "\033[0m"
+#define BLUE(print)  "\033[1;34m" print "\033[0m"
 
 const double EPS = 1e-8;       ///< The error of double number
 
@@ -65,6 +68,7 @@ int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsNumFailure );  
 int FileTestSuccess ( FILE *DataFile );                                                     ///< The function that print file test success
 int FileTestFailure ( FILE *DataFile );                                                     ///< The function that print file test failure
 int CloseFile ( FILE *DataFile);                                                            ///< The function that close file
+void HelpPrint();                                                                           ///< The function that print help text
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );  ///< The function that checks the test values and the resulting
 bool CheckDoubleEquality ( double Num1, double Num2 );                                      ///< The function that compares numbers of the double type
 
@@ -80,23 +84,38 @@ bool CheckDoubleEquality ( double Num1, double Num2 );                          
     * @author LZK
     */
 
-int main()
+int main( int argc, const char *argv[] )
     {
     double a = 0, b = 0, c = 0;
     double x1 = 0, x2 = 0;
-
-    FuncFileReader ();
-
-    if (SucssefulTesting ( TestQuadratic () ) == Failure)                                   /*Testing Quadratic*/
+    for ( int i = 1; i < argc; i += 2 )
         {
-        return Failure;
+        if      ( (strcmp(argv [i], "--help") == 0) || (strcmp(argv [i], "-h") == 0) )
+            {
+            HelpPrint();                                                                        /*Help print*/
+            return Success;
+            }
+
+        else if ( strcmp(argv [i], "--filetests") == 0 )
+            {
+            return FuncFileReader ();                                                           /*File Testing Quadratic*/
+            }
+
+        else if ( strcmp(argv [i], "--tests") == 0 )
+            {
+            if (SucssefulTesting ( TestQuadratic () ) == Failure)                               /*Testing Quadratic*/
+                {
+                return Failure;
+                }
+            return Success;
+            }
         }
 
-    QuadraticInput ( &a, &b, &c );                                                          /*Input*/
+    QuadraticInput ( &a, &b, &c );                                                              /*Input*/
 
     int SwitchReturn = SolutionOfQuadratic( a, b, c, &x1, &x2 );
 
-    AnswerOutput ( SwitchReturn, x1, x2 );                                                  /*Output*/
+    AnswerOutput ( SwitchReturn, x1, x2 );                                                      /*Output*/
 
     return Success;
     }
@@ -212,8 +231,8 @@ int QuadraticInput ( double* a, double* b, double* c )
     int SuccessfulInput = 0;
     while ( SuccessfulInput != 3 )
         {
-        printf  ( "#Реши квадратное уравнение.\n");
-        printf  ( "#Введите коэффиценты через запятую с дробной частью a,b,c:" );
+        printf  ( BLUE("#Решите квадратное уравнение.\n") );
+        printf  ( BLUE("#Введите коэффиценты через запятую с дробной частью a,b,c:") );
         SuccessfulInput = scanf ("%lg,%lg,%lg", a, b, c );
         if ( SuccessfulInput != 3 )
             {
@@ -223,10 +242,10 @@ int QuadraticInput ( double* a, double* b, double* c )
                 DelBuffer = getchar();
                 }
 
-            printf ( "\nВы ввели неверные значения, попробуйте еще раз.\n\n" );
+            printf ( RED("\nВы ввели неверные значения, попробуйте еще раз.\n\n") );
             }
         }
-    printf  ( "Вы ввели: %lg, %lg, %lg\n", *a, *b, *c );
+    printf  ( YELLOW("Вы ввели: %lg, %lg, %lg\n"), *a, *b, *c );
     return Success;
     }
 
@@ -237,19 +256,19 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
     {
     switch ( SwitchReturn )
         {
-        case  NoRoots: printf("Нет решений\n");
+        case  NoRoots:      printf( GREEN("Нет решений\n") );
                 break;
 
-        case  OneRoot: printf("x = %lg\n", x1);
+        case  OneRoot:      printf( GREEN("x = %lg\n"), x1 );
                 break;
 
-        case  TwoRoots: printf("x1 = %lg, x2 = %lg\n", x1, x2);
+        case  TwoRoots:     printf( GREEN("x1 = %lg, x2 = %lg\n"), x1, x2 );
                 break;
 
-        case  AllNumbers: printf("Решением является любое число");
+        case  AllNumbers:   printf( GREEN("Решением является любое число") );
                 break;
 
-        default: printf ("main(): ERROR: SwitchReturn = %d\n", SwitchReturn);
+        default: printf ( RED("main(): ERROR: SwitchReturn = %d\n"), SwitchReturn);
                 return Failure;
         }
     return Success;
@@ -260,7 +279,7 @@ int AnswerOutput ( int SwitchReturn, double x1, double x2 )
     /*---------------The program testing module-------------------------------------------*/
 int TestQuadratic()
     {
-    printf ( "Запущены тесты, немного подождите..\n" );
+    printf ( YELLOW("Запущены тесты, немного подождите..\n") );
     int TestResult = 0;
     const int NumOfTests = 8;
 
@@ -298,12 +317,12 @@ int AppealToQuadratic( TestQuadraticSrtruct DataSet )
     if ( !CheckAnswer ( DataSet, x1, x2, NumRootsReal ) )
         {
         printf
-            (
+            ( RED(
             "Ошибка в коде программы!\n"
             "Ошибка в тесте под номером:%d.\n"
             "a = %lg, b = %lg, c = %lg\n"
             "Ожидаемые  результаты: x1 = %lg, x2 = %lg, количество решений = %d\n"
-            "Полученные результаты: x1 = %lg, x2 = %lg, количество решений = %d\n\n",
+            "Полученные результаты: x1 = %lg, x2 = %lg, количество решений = %d\n\n"),
             DataSet.NumberTest, DataSet.a, DataSet.b, DataSet.c,
             DataSet.x1Supposed, DataSet.x2Supposed, DataSet.NumRootsSup, x1, x2, NumRootsReal
             );
@@ -340,12 +359,12 @@ int SucssefulTesting ( int TestQuadratic )
     {
     if ( TestQuadratic == 1 )
         {
-        printf ( "Тесты не пройдены!\n" );
+        printf ( RED("Тесты не пройдены!\n") );
         return Failure;
         }
     else
         {
-        printf ( "Тесты успешно пройдены!\n\n" );
+        printf ( GREEN("Тесты успешно пройдены!\n\n") );
         return Success;
         }
     }
@@ -368,7 +387,7 @@ int FuncFileReader ()
     DataFile = fopen ( "TestArray.txt", "r" );
     if ( DataFile == NULL )
         {
-        perror ( "Не удалось открыть файл!\n" );
+        perror ( RED("Не удалось открыть файл!\n") );
         return Failure;
         }
     else
@@ -376,7 +395,7 @@ int FuncFileReader ()
         int fscresult = 0;
         int FileTestsNumFailure = 0;
         ScanTestFile( DataFile, &fscresult, &FileTestsNumFailure );
-        printf ("Успешно считанных переменных из файла: %d\n", fscresult);
+        printf ( YELLOW("Успешно считанных переменных из файла: %d\n"), fscresult );
 
         if ( FileTestsNumFailure == 0 )
             {
@@ -392,13 +411,13 @@ int FuncFileReader ()
 
 int FileTestSuccess ( FILE *DataFile )
     {
-    printf ( "Тест из файла успешно пройден.\n");
+    printf ( GREEN("Тест из файла успешно пройден.\n") );
     return CloseFile ( DataFile );
     }
 
 int FileTestFailure ( FILE *DataFile )
     {
-    printf ( "Тест из файла провален!\n" );
+    printf ( RED("Тест из файла провален!\n") );
     CloseFile ( DataFile );
     return Failure;
     }
@@ -414,7 +433,7 @@ int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsNumFailure )
         if (EndFile != NumParamFile )
             {
             *FileTestsNumFailure += 1;
-            printf ("Тест в файле имеет неверный вид!\n");
+            printf ( RED("Тест в файле имеет неверный вид!\n") );
             break;
             }
         else
@@ -429,21 +448,31 @@ int ScanTestFile ( FILE *DataFile, int* fscresult, int* FileTestsNumFailure )
     /*------------------------------------------------------------------------------------*/
 
     /*---------------Close File Function--------------------------------------------------*/
-
 int CloseFile ( FILE *DataFile)
     {
     fclose ( DataFile );
     if ( DataFile != NULL )
         {
-        printf ( "Файл успешно закрыт.\n\n" );
+        printf ( GREEN("Файл успешно закрыт.\n\n") );
         return Success;
         }
     else
         {
-        perror ( "ERROR: Файл не закрыт!\n\n" );
+        perror ( RED("ERROR: Файл не закрыт!\n\n") );
         return Failure;
         }
     }
 
     /*------------------------------------------------------------------------------------*/
 
+    /*---------------Help Module----------------------------------------------------------*/
+void HelpPrint()
+    {
+    printf ( "\nПрограмма решает квадратное уравнение.\n"
+             "С помощью флагов"     BLUE(" \"--help\" ")        "и"     BLUE(" \"-h\" ") "открывается это сообщение.\n"
+             "С помощью флагa"      BLUE(" \"--filetests\" ")                            "запускается тест из файла.\n"
+             "С помощью флагa"      BLUE(" \"--tests\" ")                                "запускается тест из программы.\n"
+             "По умолчанию программа предложит ввести коэффиценты вашего уравнения и выведет ответ.\n" );
+    }
+
+    /*------------------------------------------------------------------------------------*/
