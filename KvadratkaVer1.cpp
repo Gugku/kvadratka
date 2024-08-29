@@ -10,6 +10,21 @@
 const double EPS = 1e-8;       ///< The error of double number
 
 /*!
+    *   @brief Flags are not true at 0, true at 1
+    *   @param Help                 Starts printing help
+    *   @param FileTests            Runs the test from a file
+    *   @param Tests                Runs the test
+    *   @author LZK
+*/
+
+struct Flag
+    {
+    bool Help;
+    bool FileTests;
+    bool Tests;
+    };
+
+/*!
     *   @brief The ability to convey the number of solutions in words
     *   @param NumberTest           Number Test type int
     *   @param a                    The first  coefficient of the quadratic equation type double
@@ -69,9 +84,9 @@ int FileTestSuccess ( FILE *DataFile );                                         
 int FileTestFailure ( FILE *DataFile );                                                     ///< The function that print file test failure
 int CloseFile ( FILE *DataFile);                                                            ///< The function that close file
 void HelpPrint();                                                                           ///< The function that print help text
+void FlagFunc ( int argcFlag, const char *argvFlag[], Flag* DataFlag );                     ///< The function that defines the flag
 bool CheckAnswer ( TestQuadraticSrtruct DataSet, double x1, double x2, int NumRootsReal );  ///< The function that checks the test values and the resulting
 bool CheckDoubleEquality ( double Num1, double Num2 );                                      ///< The function that compares numbers of the double type
-
 
     /*---------------Main-----------------------------------------------------------------*/
 
@@ -88,27 +103,23 @@ int main( int argc, const char *argv[] )
     {
     double a = 0, b = 0, c = 0;
     double x1 = 0, x2 = 0;
-    for ( int i = 1; i < argc; i += 2 )
+    Flag DataFlag = {};
+
+    FlagFunc ( argc, argv, &DataFlag );                                                         /*Flag definition*/
+
+    if ( DataFlag.Help == true )
         {
-        if      ( (strcmp(argv [i], "--help") == 0) || (strcmp(argv [i], "-h") == 0) )
-            {
-            HelpPrint();                                                                        /*Help print*/
-            return Success;
-            }
+        HelpPrint();
+        }
 
-        else if ( strcmp(argv [i], "--filetests") == 0 )
-            {
-            return FuncFileReader ();                                                           /*File Testing Quadratic*/
-            }
+    if ( DataFlag.FileTests == true )
+        {
+        FuncFileReader ();
+        }
 
-        else if ( strcmp(argv [i], "--tests") == 0 )
-            {
-            if (SucssefulTesting ( TestQuadratic () ) == Failure)                               /*Testing Quadratic*/
-                {
-                return Failure;
-                }
-            return Success;
-            }
+    if ( DataFlag.Tests == true )
+        {
+        SucssefulTesting ( TestQuadratic () );
         }
 
     QuadraticInput ( &a, &b, &c );                                                              /*Input*/
@@ -472,7 +483,32 @@ void HelpPrint()
              "С помощью флагов"     BLUE(" \"--help\" ")        "и"     BLUE(" \"-h\" ") "открывается это сообщение.\n"
              "С помощью флагa"      BLUE(" \"--filetests\" ")                            "запускается тест из файла.\n"
              "С помощью флагa"      BLUE(" \"--tests\" ")                                "запускается тест из программы.\n"
-             "По умолчанию программа предложит ввести коэффиценты вашего уравнения и выведет ответ.\n" );
+             "По умолчанию программа предложит ввести коэффиценты вашего уравнения и выведет ответ.\n\n" );
+    }
+
+    /*------------------------------------------------------------------------------------*/
+
+    /*---------------Flag Module----------------------------------------------------------*/
+void FlagFunc ( int argcFlag, const char *argvFlag[], Flag* DataFlag )
+    {
+    for ( int i = 1; i < argcFlag; i++ )
+        {
+        if      ( (strcmp(argvFlag [i], "--help") == 0) || (strcmp(argvFlag [i], "-h") == 0) )
+            {
+            (*DataFlag).Help = true;
+            }
+
+        else if ( strcmp(argvFlag [i], "--filetests") == 0 )
+            {
+            (*DataFlag).FileTests = true;
+            }
+
+        else if ( strcmp(argvFlag [i], "--tests") == 0 )
+            {
+            (*DataFlag).Tests = true;
+            }
+
+        }
     }
 
     /*------------------------------------------------------------------------------------*/
